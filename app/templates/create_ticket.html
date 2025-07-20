@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="form-container">
+    <form method="POST" action="" enctype="multipart/form-data">
+        {{ form.hidden_tag() }}
+        <fieldset>
+            <legend>{{ legend }}</legend>
+            <div class="form-group">
+                {{ form.title.label(class="form-label") }}
+                {% if form.title.errors %}
+                    {{ form.title(class="form-control form-control-invalid") }}
+                    <div class="invalid-feedback">
+                        {% for error in form.title.errors %}<span>{{ error }}</span>{% endfor %}
+                    </div>
+                {% else %}
+                    {{ form.title(class="form-control") }}
+                {% endif %}
+            </div>
+            <div class="form-group">
+                {{ form.description.label(class="form-label") }}
+                {% if form.description.errors %}
+                    {{ form.description(class="form-control form-control-invalid", rows=5) }}
+                    <div class="invalid-feedback">
+                        {% for error in form.description.errors %}<span>{{ error }}</span>{% endfor %}
+                    </div>
+                {% else %}
+                    {{ form.description(class="form-control", rows=5) }}
+                {% endif %}
+            </div>
+            <div class="form-group">
+                {{ form.priority.label(class="form-label") }}
+                {{ form.priority(class="form-control") }}
+            </div>
+            <div class="form-group">
+                {{ form.attachments.label(class="form-label") }}
+                {{ form.attachments(class="form-control") }}
+                {% if form.attachments.errors %}
+                    <div class="invalid-feedback">
+                        {% for error in form.attachments.errors %}<span>{{ error }}</span>{% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+        </fieldset>
+        <div class="form-group">
+            {{ form.submit(class="btn btn-primary") }}
+        </div>
+    </form>
+</div>
+{% endblock content %}

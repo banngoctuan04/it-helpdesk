@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="thank-you-container">
+    <i class="fas fa-check-circle thank-you-icon"></i>
+    <h1>Cảm ơn bạn đã đánh giá!</h1>
+    <p>Phản hồi của bạn rất quan trọng và giúp chúng tôi cải thiện dịch vụ tốt hơn.</p>
+    <a href="{{ url_for('main.home') }}" class="btn btn-primary">Quay về Dashboard</a>
+</div>
+{% endblock content %}

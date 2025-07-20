@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="content-header">
+    <h1>Các Ticket của tôi</h1>
+    <a href="{{ url_for('main.create_ticket') }}" class="btn btn-primary"><i class="fas fa-plus-circle"></i> Tạo Ticket Mới</a>
+</div>
+<hr>
+
+{% if tickets_pagination.items %}
+    <div class="ticket-card-container">
+        {% for ticket in tickets_pagination.items %}
+        <div class="ticket-card">
+            <div class="card-header">
+                <a href="{{ url_for('main.ticket', ticket_id=ticket.id) }}" class="card-title">{{ ticket.title }}</a>
+                <span class="badge status-{{ ticket.status }}">{{ ticket.status.replace('_', ' ')|title }}</span>
+            </div>
+            <div class="card-body">
+                <p>{{ ticket.description|truncate(150) }}</p>
+            </div>
+            <div class="card-footer">
+                <div class="footer-info">
+                    <span class="priority-{{ ticket.priority }}"><i class="fas fa-flag"></i> {{ ticket.priority|title }}</span>
+                    <span><i class="fas fa-user"></i> {{ ticket.author.username }}</span>
+                    <span><i class="fas fa-calendar-alt"></i> {{ ticket.created_at.strftime('%d-%m-%Y') }}</span>
+                </div>
+                <div class="footer-actions">
+                    {% if (ticket.author == current_user and ticket.status == 'open') or current_user.is_admin() %}
+                        <a href="{{ url_for('main.edit_ticket', ticket_id=ticket.id) }}" class="btn-icon" title="Sửa"><i class="fas fa-edit"></i></a>
+                        <form action="{{ url_for('main.delete_ticket', ticket_id=ticket.id) }}" method="POST" onsubmit="return confirm('Bạn có chắc chắn muốn xóa ticket này?');">
+                            <button type="submit" class="btn-icon" title="Xóa"><i class="fas fa-trash-alt"></i></button>
+                        </form>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="pagination-container">
+        {% for page_num in tickets_pagination.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
+            {% if page_num %}
+                {% if tickets_pagination.page == page_num %}
+                    <a href="{{ url_for('main.user_dashboard', page=page_num) }}" class="btn btn-primary">{{ page_num }}</a>
+                {% else %}
+                    <a href="{{ url_for('main.user_dashboard', page=page_num) }}" class="btn btn-secondary">{{ page_num }}</a>
+                {% endif %}
+            {% else %}
+                ...
+            {% endif %}
+        {% endfor %}
+    </div>
+{% else %}
+    <p>Bạn chưa có ticket nào. Hãy tạo một ticket mới!</p>
+{% endif %}
+{% endblock content %}

@@ -1,0 +1,13 @@
+# Môi trường ảo của Python
+venv/
+
+# Cache của Python
+__pycache__/
+*.pyc
+
+# File chứa các biến môi trường và mật khẩu (CỰC KỲ QUAN TRỌNG)
+.env
+
+# Các file của hệ điều hành
+.DS_Store
+Thumbs.db

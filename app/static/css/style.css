@@ -1,0 +1,642 @@
+/* General Reset & Fonts */
+:root {
+    --primary-color: #007bff;
+    --primary-hover: #0056b3;
+    --secondary-color: #6c757d;
+    --success-color: #28a745;
+    --danger-color: #dc3545;
+    --warning-color: #ffc107;
+    --light-bg: #f8f9fa;
+    --dark-text: #343a40;
+    --light-text: #ffffff;
+    --border-color: #dee2e6;
+}
+
+body {
+    font-family: 'Roboto', sans-serif;
+    margin: 0;
+    background-color: var(--light-bg);
+    color: var(--dark-text);
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+/* Layout */
+.main-content {
+    flex: 1;
+}
+
+.container {
+    width: 90%;
+    max-width: 1200px;
+    margin: 2rem auto;
+    padding: 2rem;
+    background: var(--light-text);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+    border-radius: 8px;
+}
+
+/* Header & Navigation */
+.site-header {
+    background: var(--light-text);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 0 5%;
+}
+
+.nav-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 70px;
+}
+
+.nav-brand {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--primary-color);
+    text-decoration: none;
+}
+
+.nav-links {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.nav-links a {
+    text-decoration: none;
+    color: var(--dark-text);
+    font-weight: 500;
+    padding: 8px 0;
+    border-bottom: 2px solid transparent;
+    transition: all 0.3s ease;
+}
+
+.nav-links a:hover {
+    color: var(--primary-color);
+    border-bottom-color: var(--primary-color);
+}
+
+/* User Menu Dropdown */
+.user-menu {
+    position: relative;
+    cursor: pointer;
+}
+
+.nav-user {
+    font-weight: 500;
+    padding: 8px;
+    background-color: #e9ecef;
+    border-radius: 20px;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    right: 0;
+    background-color: var(--light-text);
+    min-width: 160px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    z-index: 1;
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+.dropdown-content a {
+    color: black;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+    border-bottom: none;
+}
+
+.dropdown-content a:hover {
+    background-color: #f1f1f1;
+    border-bottom: none;
+}
+
+.user-menu:hover .dropdown-content {
+    display: block;
+}
+
+
+/* Footer */
+.site-footer {
+    text-align: center;
+    padding: 20px;
+    background: var(--dark-text);
+    color: var(--light-text);
+}
+
+/* Forms, Buttons, Alerts, Tables... (Các style khác giữ nguyên hoặc cải tiến) */
+.form-container {
+    max-width: 500px;
+    margin: 2rem auto;
+    padding: 2rem;
+    background: #fff;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+}
+.form-group { margin-bottom: 1.2rem; }
+.form-label { display: block; margin-bottom: 0.5rem; font-weight: 500; }
+.form-control {
+    width: 100%;
+    padding: 0.75rem;
+    font-size: 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    box-sizing: border-box;
+    transition: border-color 0.3s ease;
+}
+.form-control:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+.btn {
+    display: inline-block;
+    padding: 12px 24px;
+    font-size: 1rem;
+    font-weight: 500;
+    border-radius: 5px;
+    cursor: pointer;
+    text-decoration: none;
+    border: none;
+    transition: background-color 0.3s ease;
+}
+.btn-primary { background-color: var(--primary-color); color: var(--light-text); }
+.btn-primary:hover { background-color: var(--primary-hover); }
+.btn-danger { background-color: var(--danger-color); color: var(--light-text); }
+.btn-secondary { background-color: var(--secondary-color); color: var(--light-text); }
+
+.alert { padding: 1rem; margin-bottom: 1rem; border: 1px solid transparent; border-radius: .25rem; }
+.alert-success { color: #155724; background-color: #d4edda; border-color: #c3e6cb; }
+.alert-danger { color: #721c24; background-color: #f8d7da; border-color: #f5c6cb; }
+.alert-info { color: #0c5460; background-color: #d1ecf1; border-color: #bee5eb; }
+
+.ticket-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1.5rem;
+}
+.ticket-table th, .ticket-table td {
+    border: 1px solid var(--border-color);
+    padding: 12px;
+    text-align: left;
+}
+.ticket-table th { background-color: var(--light-bg); font-weight: 700; }
+.ticket-table tr:nth-child(even) { background-color: var(--light-bg); }
+.ticket-table tr:hover { background-color: #e9ecef; }
+
+.status-open { color: #dc3545; font-weight: bold; }
+.status-in_progress { color: #ffc107; font-weight: bold; }
+.status-closed { color: #28a745; font-weight: bold; }
+
+/* Thêm các style này vào cuối file style.css */
+
+/* Ticket Card Layout */
+.ticket-card-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 1.5rem;
+}
+
+.ticket-card {
+    background: #fff;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.ticket-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+.card-header {
+    padding: 1rem 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.card-title {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--dark-text);
+    text-decoration: none;
+}
+.card-title:hover {
+    color: var(--primary-color);
+}
+
+.card-body {
+    padding: 1rem 1.5rem;
+    flex-grow: 1;
+}
+.card-body p {
+    margin: 0;
+    line-height: 1.6;
+}
+
+.card-footer {
+    padding: 1rem 1.5rem;
+    background-color: var(--light-bg);
+    border-top: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.9rem;
+    color: var(--secondary-color);
+}
+
+.footer-info {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+.footer-info span i {
+    margin-right: 5px;
+}
+
+.footer-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+.btn-icon {
+    background: none;
+    border: none;
+    color: var(--secondary-color);
+    font-size: 1rem;
+    cursor: pointer;
+    padding: 5px;
+}
+.btn-icon:hover {
+    color: var(--primary-color);
+}
+.btn-icon .fa-trash-alt:hover {
+    color: var(--danger-color);
+}
+
+/* Badges for Status & Priority */
+.badge {
+    padding: 0.3em 0.8em;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--light-text);
+}
+.badge.status-open { background-color: var(--danger-color); }
+.badge.status-in_progress { background-color: #f0ad4e; }
+.badge.status-closed { background-color: var(--success-color); }
+
+.priority-low { color: var(--success-color); }
+.priority-medium { color: var(--warning-color); }
+.priority-high { color: var(--danger-color); }
+
+/* Rating Stars */
+.rating-form .stars {
+    display: flex;
+    flex-direction: row-reverse;
+    justify-content: flex-end;
+}
+.rating-form .stars input[type="radio"] { display: none; }
+.rating-form .stars label {
+    font-size: 2rem;
+    color: #ddd;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+.rating-form .stars input[type="radio"]:checked ~ label,
+.rating-form .stars label:hover,
+.rating-form .stars label:hover ~ label {
+    color: #ffc107;
+}
+
+.display-rating .fa-star {
+    color: #ffc107;
+}
+/* Stats Cards Styling */
+.stats-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.stat-card {
+    background-color: var(--light-text);
+    padding: 1.5rem;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    text-align: center;
+}
+
+.stat-card h3 {
+    margin: 0 0 0.5rem 0;
+    font-size: 2.5rem;
+    color: var(--primary-color);
+}
+
+.stat-card p {
+    margin: 0;
+    font-size: 1rem;
+    color: var(--secondary-color);
+    font-weight: 500;
+}
+/* Thank You Page Styling */
+.thank-you-container {
+    text-align: center;
+    padding: 3rem 1rem;
+}
+
+.thank-you-icon {
+    font-size: 5rem;
+    color: var(--success-color);
+    margin-bottom: 1.5rem;
+}
+
+.thank-you-container h1 {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+}
+
+.thank-you-container p {
+    font-size: 1.2rem;
+    color: var(--secondary-color);
+    margin-bottom: 2rem;
+}
+
+/* Comments Section */
+.comment-list { margin-top: 1.5rem; }
+.comment {
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+}
+.user-comment { border-left: 5px solid var(--primary-color); }
+.support-comment { border-left: 5px solid var(--success-color); background-color: #f8f9fa; }
+.comment-author { font-weight: 700; margin-bottom: 0.5rem; }
+.comment-content p { margin: 0; }
+.comment-timestamp { font-size: 0.8rem; color: var(--secondary-color); text-align: right; margin-top: 0.5rem; }
+
+/* Attachments */
+.attachments-section ul { list-style: none; padding-left: 0; }
+.attachments-section li a { text-decoration: none; }
+
+/* Filter Form */
+.filter-form-container {
+    background-color: #fff;
+    padding: 1.5rem;
+    border-radius: 8px;
+    margin-bottom: 2rem;
+    border: 1px solid var(--border-color);
+}
+.form-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 1rem;
+}
+.form-row .form-group {
+    flex: 1;
+    min-width: 150px;
+    margin-bottom: 0;
+}
+.form-actions {
+    display: flex;
+    gap: 0.5rem;
+    padding-bottom: 0.75rem; /* Căn chỉnh với các ô input */
+}
+
+/* Activity Log */
+.activity-log-section ul {
+    list-style: none;
+    padding-left: 0;
+    margin-top: 1rem;
+    border-left: 2px solid var(--border-color);
+}
+.activity-log-section li {
+    padding: 0.5rem 1rem;
+    position: relative;
+}
+.activity-log-section li::before {
+    content: '';
+    position: absolute;
+    left: -7px;
+    top: 12px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background-color: var(--secondary-color);
+}
+.log-timestamp {
+    color: #6c757d;
+    font-size: 0.9em;
+}
+
+/* ============================= */
+/* === CSS CHO CHATBOT MỚI === */
+/* ============================= */
+
+.chatbox {
+    position: fixed;
+    /* Đẩy chatbox lên cao hơn để không che footer */
+    bottom: 90px; 
+    right: 20px;
+    width: 370px;
+    max-width: 90vw;
+    height: 500px;
+    background-color: #ffffff;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
+    transform-origin: bottom right;
+    z-index: 1000;
+}
+
+.chatbox.hidden {
+    transform: scale(0.5);
+    opacity: 0;
+    pointer-events: none;
+}
+
+.chatbox-header {
+    background: linear-gradient(135deg, var(--primary-color), #0056b3);
+    color: white;
+    padding: 1rem;
+    font-weight: bold;
+    font-size: 1.2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top-left-radius: 15px;
+    border-top-right-radius: 15px;
+}
+
+/* NÚT ĐÓNG MỚI */
+.close-chat-btn {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 2rem;
+    cursor: pointer;
+    line-height: 1;
+    opacity: 0.8;
+}
+.close-chat-btn:hover {
+    opacity: 1;
+}
+
+.chatbox-messages {
+    flex-grow: 1;
+    padding: 15px;
+    overflow-y: auto;
+    background-color: #f4f7f9;
+}
+
+.message {
+    margin-bottom: 15px;
+    padding: 10px 15px;
+    border-radius: 20px;
+    max-width: 85%;
+    line-height: 1.5;
+    word-wrap: break-word;
+}
+
+.message.bot-message {
+    background-color: #e9ecef;
+    color: #333;
+    align-self: flex-start;
+    border-bottom-left-radius: 5px;
+}
+.message.bot-message ul, .message.bot-message ol {
+    padding-left: 20px;
+    margin: 5px 0 0 0;
+}
+.message.bot-message code {
+    background-color: #d1d1d1;
+    padding: 2px 5px;
+    border-radius: 3px;
+    font-family: monospace;
+}
+
+.message.user-message {
+    background-color: var(--primary-color);
+    color: white;
+    margin-left: auto;
+    border-bottom-right-radius: 5px;
+}
+
+.chatbox-input {
+    display: flex;
+    padding: 10px;
+    border-top: 1px solid var(--border-color);
+}
+
+#user-input {
+    flex-grow: 1;
+    border: 1px solid var(--border-color);
+    border-radius: 20px;
+    padding: 10px 15px;
+    font-size: 1rem;
+}
+
+#send-btn {
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 45px;
+    height: 45px;
+    margin-left: 10px;
+    cursor: pointer;
+    font-size: 1.2rem;
+    flex-shrink: 0;
+}
+
+.chat-bubble-toggle {
+    position: fixed;
+    /* Đẩy bong bóng chat lên cao hơn */
+    bottom: 20px;
+    right: 20px;
+    width: 60px;
+    height: 60px;
+    background-color: var(--primary-color);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 24px;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    transition: transform 0.2s ease;
+    z-index: 999;
+}
+.chat-bubble-toggle.hidden {
+    transform: scale(0);
+}
+
+/* Thêm vào cuối file app/static/css/style.css */
+.typing-indicator span {
+    height: 8px;
+    width: 8px;
+    background-color: #9E9E9E;
+    border-radius: 50%;
+    display: inline-block;
+    animation: bounce 1.4s infinite ease-in-out both;
+}
+.typing-indicator span:nth-of-type(1) { animation-delay: -0.32s; }
+.typing-indicator span:nth-of-type(2) { animation-delay: -0.16s; }
+@keyframes bounce {
+    0%, 80%, 100% { transform: scale(0); }
+    40% { transform: scale(1.0); }
+}
+
+
+/* Thêm vào cuối file style.css */
+@media (max-width: 768px) {
+    .nav-container {
+        flex-direction: column;
+        height: auto;
+        padding: 1rem 0;
+    }
+    .nav-links {
+        margin-top: 1rem;
+        flex-direction: column;
+        gap: 1rem;
+    }
+    .form-row {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .form-actions {
+        padding-bottom: 0;
+    }
+}
+
+.form-control.is-invalid {
+    border-color: var(--danger-color);
+}
+.invalid-feedback {
+    color: var(--danger-color);
+    font-size: 0.875em;
+    margin-top: 0.25rem;
+}
+
+.message.bot-message .chat-menu-button {
+    margin-right: 5px;
+    margin-bottom: 5px;
+}

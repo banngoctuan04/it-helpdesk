@@ -1,0 +1,174 @@
+-- KỊCH BẢN TẠO DATABASE HOÀN CHỈNH - DỮ LIỆU 1 THÁNG
+CREATE DATABASE IF NOT EXISTS helpdesk_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+USE helpdesk_db;
+-- Bước 2: Tạo lại cấu trúc bảng chuẩn
+CREATE TABLE user (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(80) UNIQUE NOT NULL,
+    email VARCHAR(120) UNIQUE NOT NULL,
+    password_hash VARCHAR(128) NOT NULL,
+    full_name VARCHAR(100),
+    phone_number VARCHAR(20),
+    department VARCHAR(100),
+    last_login_at TIMESTAMP NULL,
+    role ENUM('user', 'support', 'admin') NOT NULL DEFAULT 'user',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE category (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) UNIQUE NOT NULL
+);
+
+CREATE TABLE ticket (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    title VARCHAR(100) NOT NULL,
+    description TEXT NOT NULL,
+    priority ENUM('low', 'medium', 'high') NOT NULL DEFAULT 'medium',
+    status ENUM('open', 'in_progress', 'closed') NOT NULL DEFAULT 'open',
+    resolution_details TEXT,
+    created_by INT NOT NULL,
+    assigned_to INT,
+    category_id INT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    closed_at TIMESTAMP NULL,
+    FOREIGN KEY (created_by) REFERENCES user(id) ON DELETE CASCADE,
+    FOREIGN KEY (assigned_to) REFERENCES user(id) ON DELETE SET NULL,
+    FOREIGN KEY (category_id) REFERENCES category(id) ON DELETE SET NULL
+);
+
+CREATE TABLE comment (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    content TEXT NOT NULL,
+    is_internal BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    user_id INT NOT NULL,
+    ticket_id INT NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE,
+    FOREIGN KEY (ticket_id) REFERENCES ticket(id) ON DELETE CASCADE
+);
+
+CREATE TABLE attachment (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    filename VARCHAR(255) NOT NULL,
+    filepath VARCHAR(255) NOT NULL,
+    user_id INT,
+    ticket_id INT NOT NULL,
+    uploaded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE SET NULL,
+    FOREIGN KEY (ticket_id) REFERENCES ticket(id) ON DELETE CASCADE
+);
+
+CREATE TABLE review (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    ticket_id INT UNIQUE NOT NULL,
+    reviewed_employee_id INT NOT NULL,
+    rating INT NOT NULL,
+    feedback TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (ticket_id) REFERENCES ticket(id) ON DELETE CASCADE,
+    FOREIGN KEY (reviewed_employee_id) REFERENCES user(id) ON DELETE CASCADE,
+    CHECK (rating IS NULL OR (rating >= 1 AND rating <= 5))
+);
+
+CREATE TABLE activity_log (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    ticket_id INT NOT NULL,
+    user_id INT,
+    action TEXT NOT NULL,
+    details TEXT,
+    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (ticket_id) REFERENCES ticket(id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE SET NULL
+);
+
+-- Tối ưu hóa: Thêm Indexes
+CREATE INDEX idx_ticket_status ON ticket(status);
+CREATE INDEX idx_ticket_priority ON ticket(priority);
+
+-- --- BƯỚC 3: NẠP DỮ LIỆU MẪU MỚI (TRONG VÒNG 1 THÁNG) ---
+SET @pw_admin = '$2b$12$EixZaYVK1fs7d9jJ9aJ1UuPx/aAVg4hM1p9S2G2gMhD.CZLp4a7.2'; -- adminpassword
+SET @pw_support = '$2b$12$KkQ8YdE.l5D.jB3u1UuJ5.Qe7Vn7zQ8f/4bJgYtJ3eS5H.L6x.i8G'; -- supportpassword
+SET @pw_user = '$2b$12$6qgV.P8pczUvAOTomGL/3u1t/b9YgIePEXj3qa4ffwI6aY4fXnB/m'; -- password
+
+INSERT INTO `user` (`id`, `username`, `email`, `password_hash`, `full_name`, `department`, `role`) VALUES
+(1, 'admin', 'admin@example.com', @pw_admin, 'Quản Trị Viên', 'IT', 'admin'),
+(2, 'support_hieu', 'hieu.tran@example.com', @pw_support, 'Trần Trung Hiếu', 'IT', 'support'),
+(3, 'support_linh', 'linh.nguyen@example.com', @pw_support, 'Nguyễn Thùy Linh', 'IT', 'support'),
+(4, 'an_le', 'an.le@example.com', @pw_user, 'Lê Thị An', 'Kế toán', 'user'),
+(5, 'binh_pham', 'binh.pham@example.com', @pw_user, 'Phạm Văn Bình', 'Kế toán', 'user'),
+(6, 'chi_do', 'chi.do@example.com', @pw_user, 'Đỗ Thị Chi', 'Kế toán', 'user'),
+(7, 'dung_tran', 'dung.tran@example.com', @pw_user, 'Trần Tiến Dũng', 'Nhân sự', 'user'),
+(8, 'giang_hoang', 'giang.hoang@example.com', @pw_user, 'Hoàng Hương Giang', 'Nhân sự', 'user'),
+(9, 'huong_ly', 'huong.ly@example.com', @pw_user, 'Lý Thu Hương', 'Nhân sự', 'user'),
+(10, 'khanh_vu', 'khanh.vu@example.com', @pw_user, 'Vũ Duy Khánh', 'Kinh doanh', 'user'),
+(11, 'lam_doan', 'lam.doan@example.com', @pw_user, 'Đoàn Thanh Lâm', 'Kinh doanh', 'user'),
+(12, 'mai_bui', 'mai.bui@example.com', @pw_user, 'Bùi Tuyết Mai', 'Kinh doanh', 'user'),
+(13, 'nam_nguyen', 'nam.nguyen@example.com', @pw_user, 'Nguyễn Thành Nam', 'Kinh doanh', 'user'),
+(14, 'oanh_ho', 'oanh.ho@example.com', @pw_user, 'Hồ Kiều Oanh', 'Kinh doanh', 'user'),
+(15, 'phuong_dang', 'phuong.dang@example.com', @pw_user, 'Đặng Mai Phương', 'Marketing', 'user'),
+(16, 'quan_truong', 'quan.truong@example.com', @pw_user, 'Trương Minh Quân', 'Marketing', 'user'),
+(17, 'son_vo', 'son.vo@example.com', @pw_user, 'Võ Bá Sơn', 'Marketing', 'user'),
+(18, 'tam_dinh', 'tam.dinh@example.com', @pw_user, 'Đinh Thanh Tâm', 'Marketing', 'user'),
+(19, 'thanh_phan', 'thanh.phan@example.com', @pw_user, 'Phan Quốc Thành', 'Kỹ thuật', 'user'),
+(20, 'trung_ngo', 'trung.ngo@example.com', @pw_user, 'Ngô Quang Trung', 'Kỹ thuật', 'user'),
+(21, 'uyen_ho', 'uyen.ho@example.com', @pw_user, 'Hồ Phương Uyên', 'Kỹ thuật', 'user'),
+(22, 'viet_nguyen', 'viet.nguyen@example.com', @pw_user, 'Nguyễn Anh Việt', 'Kỹ thuật', 'user'),
+(23, 'ceo_tran', 'ceo.tran@example.com', @pw_user, 'Trần Văn Giám', 'Ban Giám đốc', 'user');
+
+INSERT INTO `category` (`id`, `name`) VALUES (1, 'Sự cố Phần cứng'),(2, 'Sự cố Phần mềm'),(3, 'Vấn đề Mạng'),(4, 'Yêu cầu Tài khoản'),(5, 'Yêu cầu khác');
+
+INSERT INTO `ticket` (`id`, `title`, `description`, `priority`, `status`, `created_by`, `assigned_to`, `category_id`, `created_at`, `closed_at`, `resolution_details`) VALUES
+(1, 'Màn hình bị sọc ngang', 'Màn hình LG của tôi đột nhiên xuất hiện nhiều sọc ngang màu hồng.', 'high', 'in_progress', 19, 2, 1, NOW() - INTERVAL 28 DAY, NULL, NULL),
+(2, 'Yêu cầu cài đặt Microsoft Project', 'Phòng Kỹ thuật cần MS Project để quản lý tiến độ dự án.', 'medium', 'closed', 20, 3, 2, NOW() - INTERVAL 25 DAY, NOW() - INTERVAL 24 DAY, 'Đã cài đặt và kích hoạt MS Project 2021.'),
+(3, 'Không thể kết nối vào Wifi "Guest"', 'Mạng Wifi dành cho khách không thể kết nối được, báo lỗi sai mật khẩu.', 'medium', 'closed', 10, 2, 3, NOW() - INTERVAL 22 DAY, NOW() - INTERVAL 22 DAY, 'Đã khởi động lại bộ phát wifi cho mạng Guest.'),
+(4, 'Tạo tài khoản email cho nhân viên mới', 'Phòng Nhân sự cần tạo email cho chị Lê Thảo My, phòng Marketing.', 'high', 'closed', 8, 1, 4, NOW() - INTERVAL 20 DAY, NOW() - INTERVAL 20 DAY, 'Đã tạo email my.le@example.com và gửi thông tin đăng nhập.'),
+(5, 'Yêu cầu cung cấp tai nghe có mic', 'Tôi cần một tai nghe mới có mic để tham gia các cuộc họp online.', 'low', 'closed', 12, 3, 5, NOW() - INTERVAL 18 DAY, NOW() - INTERVAL 17 DAY, 'Đã bàn giao tai nghe Logitech H390.'),
+(6, 'Lỗi không mở được file Word', 'File Word báo lỗi "The file is corrupted and cannot be opened".', 'high', 'in_progress', 4, 3, 2, NOW() - INTERVAL 16 DAY, NULL, NULL),
+(7, 'Máy tính chạy rất chậm khi mở Chrome', 'Mỗi khi mở nhiều tab Chrome, máy tính của tôi gần như bị treo.', 'medium', 'in_progress', 15, 2, 1, NOW() - INTERVAL 15 DAY, NULL, NULL),
+(8, 'Không in được từ máy tính cá nhân', 'Tôi không thể in ra máy in chung của công ty từ laptop cá nhân.', 'medium', 'closed', 23, 1, 3, NOW() - INTERVAL 14 DAY, NOW() - INTERVAL 13 DAY, 'Hướng dẫn người dùng cài đặt máy in mạng và driver chính xác.'),
+(9, 'Lỗi font chữ trên website nội bộ', 'Font chữ trên trang intranet bị hiển thị thành các ô vuông.', 'low', 'closed', 17, 3, 2, NOW() - INTERVAL 12 DAY, NOW() - INTERVAL 12 DAY, 'Đã sửa lỗi CSS trên web server.'),
+(10, 'Yêu cầu cấp quyền truy cập Google Analytics', 'Tôi cần quyền xem dữ liệu Google Analytics của website công ty.', 'medium', 'closed', 16, 1, 4, NOW() - INTERVAL 11 DAY, NOW() - INTERVAL 10 DAY, 'Đã cấp quyền Viewer cho tài khoản.'),
+(11, 'Bàn phím không gõ được số', 'Các phím số trên bàn phím rời của tôi không hoạt động.', 'high', 'in_progress', 6, 2, 1, NOW() - INTERVAL 9 DAY, NULL, NULL),
+(12, 'Lỗi "Your connection is not private"', 'Nhiều trang web báo lỗi bảo mật khi truy cập.', 'high', 'closed', 21, 3, 3, NOW() - INTERVAL 7 DAY, NOW() - INTERVAL 7 DAY, 'Phát hiện lỗi sai ngày giờ hệ thống trên máy người dùng. Đã chỉnh lại ngày giờ và đồng bộ với time server.'),
+(13, 'Yêu cầu đổi mật khẩu domain', 'Tôi cần đổi mật khẩu đăng nhập máy tính.', 'low', 'closed', 9, 1, 4, NOW() - INTERVAL 6 DAY, NOW() - INTERVAL 6 DAY, 'Đã hướng dẫn người dùng tự đổi mật khẩu bằng cách nhấn Ctrl+Alt+Del.'),
+(14, 'Phần mềm Skype tự động tắt', 'Skype của tôi thường xuyên tự thoát sau vài phút sử dụng.', 'medium', 'in_progress', 13, 2, 2, NOW() - INTERVAL 5 DAY, NULL, NULL),
+(15, 'Cần thay mực máy in màu', 'Máy in màu Brother ở phòng Marketing đã hết mực màu vàng.', 'medium', 'closed', 18, 3, 1, NOW() - INTERVAL 4 DAY, NOW() - INTERVAL 3 DAY, 'Đã thay hộp mực mới.'),
+(16, 'Không thể truy cập vào server test', 'Tôi không thể SSH vào server 192.168.1.50.', 'high', 'in_progress', 22, 1, 3, NOW() - INTERVAL 2 DAY, NULL, NULL),
+(17, 'Yêu cầu cung cấp USB 32GB', 'Tôi cần một chiếc USB 32GB để sao chép dữ liệu cho khách hàng.', 'low', 'closed', 11, 2, 5, NOW() - INTERVAL 1 DAY, NOW(), 'Đã bàn giao USB Kingston 32GB.'),
+(18, 'Lỗi không lưu được file trong thư mục chung', 'Tôi không có quyền ghi vào thư mục Shared/KinhDoanh/Reports.', 'medium', 'in_progress', 10, 1, 4, NOW() - INTERVAL 8 HOUR, NULL, NULL),
+(19, 'Máy tính không nhận tai nghe Bluetooth', 'Windows không tìm thấy tai nghe Sony WH-1000XM4 của tôi.', 'medium', 'open', 5, NULL, 1, NOW() - INTERVAL 4 HOUR, NULL, NULL),
+(20, 'Lỗi Excel "not responding"', 'File Excel nặng bị treo khi tôi sử dụng chức năng filter.', 'high', 'open', 4, NULL, 2, NOW() - INTERVAL 2 HOUR, NULL, NULL),
+(21, 'Yêu cầu khôi phục file đã xóa nhầm', 'Tôi lỡ xóa file "HopDong_ABC.docx" trong thư mục cá nhân trên server.', 'high', 'in_progress', 7, 1, 5, NOW() - INTERVAL 29 DAY, NULL, NULL),
+(22, 'Cần hỗ trợ cài đặt chữ ký số', 'Tôi cần cài đặt USB Token chữ ký số mới.', 'medium', 'closed', 6, 3, 2, NOW() - INTERVAL 27 DAY, NOW() - INTERVAL 27 DAY, 'Đã cài đặt thành công.'),
+(23, 'Lỗi không thể cài đặt Google Chrome', 'Trình cài đặt Google Chrome báo lỗi và không chạy.', 'low', 'closed', 20, 2, 2, NOW() - INTERVAL 26 DAY, NOW() - INTERVAL 26 DAY, 'Đã cung cấp bộ cài đặt offline.'),
+(24, 'Yêu cầu mở port trên firewall', 'Phòng Kỹ thuật cần mở port 8080 trên firewall cho server test mới.', 'high', 'in_progress', 19, 1, 3, NOW() - INTERVAL 23 DAY, NULL, NULL),
+(25, 'Âm thanh bị rè khi họp online', 'Micro của tôi bị rè khi tham gia Google Meet.', 'medium', 'closed', 12, 3, 1, NOW() - INTERVAL 21 DAY, NOW() - INTERVAL 21 DAY, 'Cập nhật driver âm thanh và hướng dẫn người dùng giảm mic boost.'),
+(26, 'Không thể truy cập trang tuyển dụng', 'Trang web tuyendung.company.com không vào được.', 'medium', 'open', 9, NULL, 3, NOW() - INTERVAL 1 HOUR, NULL, NULL),
+(27, 'Yêu cầu cấp thêm 1 màn hình', 'Tôi cần thêm 1 màn hình phụ để làm việc hiệu quả hơn.', 'low', 'closed', 5, 2, 5, NOW() - INTERVAL 19 DAY, NOW() - INTERVAL 18 DAY, 'Yêu cầu đã được duyệt và cấp màn hình Dell 24 inch.'),
+(28, 'Lỗi đồng bộ thời gian trên máy tính', 'Đồng hồ trên máy tính của tôi bị sai giờ liên tục.', 'medium', 'closed', 14, 1, 1, NOW() - INTERVAL 17 DAY, NOW() - INTERVAL 17 DAY, 'Đã cấu hình lại Windows Time service.'),
+(29, 'Không thể gỡ cài đặt phần mềm cũ', 'Tôi không thể gỡ bỏ phần mềm "ABC" trong Control Panel.', 'low', 'in_progress', 21, 3, 2, NOW() - INTERVAL 13 DAY, NULL, NULL),
+(30, 'Yêu cầu cấp tài khoản Github', 'Tôi cần một tài khoản trên hệ thống Github của công ty.', 'medium', 'closed', 22, 1, 4, NOW() - INTERVAL 8 DAY, NOW() - INTERVAL 8 DAY, 'Đã tạo và gửi lời mời.'),
+(31, 'Outlook bị crash liên tục', 'Phần mềm Outlook bị treo và tự động tắt.', 'high', 'in_progress', 11, 2, 2, NOW() - INTERVAL 4 DAY, NULL, NULL),
+(32, 'Máy tính tự khởi động lại', 'Máy tính của tôi tự động khởi động lại một cách ngẫu nhiên.', 'high', 'in_progress', 15, 3, 1, NOW() - INTERVAL 2 DAY, NULL, NULL),
+(33, 'Yêu cầu dọn dẹp ổ cứng', 'Ổ C của tôi báo đầy, cần hỗ trợ dọn dẹp.', 'low', 'open', 17, NULL, 5, NOW() - INTERVAL 6 HOUR, NULL, NULL),
+(34, 'Không thể kết nối máy in qua wifi', 'Laptop không tìm thấy máy in Brother HL-L2380DW qua mạng wifi.', 'medium', 'open', 18, NULL, 3, NOW() - INTERVAL 3 HOUR, NULL, NULL),
+(35, 'Lỗi không nhận USB', 'Máy tính không nhận diện USB khi tôi cắm vào.', 'medium', 'closed', 10, 2, 1, NOW() - INTERVAL 1 DAY, NOW(), 'Cài đặt lại driver chipset USB. Đã hoạt động bình thường.');
+
+INSERT INTO `comment` (`content`, `is_internal`, `user_id`, `ticket_id`) VALUES
+('Vui lòng cho tôi biết bạn đang dùng hệ điều hành gì nhé.', FALSE, 2, 1),
+('Mình đang dùng Windows 11 Pro.', FALSE, 19, 1),
+('NOTE: Lỗi này có thể do nguồn hoặc mainboard. Cần mang máy về phòng IT để kiểm tra kỹ hơn.', TRUE, 2, 1),
+('Chào bạn, chúng tôi đã nhận được thông tin. Team IT sẽ liên hệ bạn trong vòng 15 phút nữa.', FALSE, 3, 6),
+('Cảm ơn team!', FALSE, 4, 6),
+('Đã liên hệ người dùng. Có vẻ file excel bị lỗi macro. Sẽ remote để kiểm tra.', TRUE, 3, 6);
+
+INSERT INTO `review` (`ticket_id`, `reviewed_employee_id`, `rating`, `feedback`) VALUES
+(2, 3, 5, 'Rất nhanh và chuyên nghiệp!'),
+(3, 2, 4, 'Hỗ trợ tốt.'),
+(4, 1, 5, 'Admin xử lý yêu cầu nhanh gọn.'),
+(5, 3, 5, 'Cảm ơn bạn Linh đã cung cấp tai nghe mới.'),
+(8, 1, 4, NULL),
+(9, 3, 5, 'Sửa lỗi rất nhanh.'),
+(10, 1, 5, 'Đã nhận được quyền truy cập. Cảm ơn admin!');

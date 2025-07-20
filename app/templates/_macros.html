@@ -1,0 +1,6 @@
+{% macro get_rating_form() %}
+    {% set form = none %}
+    {% from "app/forms.py" import RatingForm %}
+    {% set form = RatingForm() %}
+    {{ return(form) }}
+{% endmacro %}

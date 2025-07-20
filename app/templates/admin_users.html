@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% block content %}
+    <div class="content-header d-flex justify-content-between align-items-center">
+        <h1>Quản lý Người dùng</h1>
+        <a href="{{ url_for('main.create_user_by_admin') }}" class="btn btn-primary">
+            <i class="fas fa-user-plus"></i> Tạo người dùng mới
+        </a>
+    </div>
+    <hr>
+    
+    <div class="filter-form-container">
+        <form method="GET" action="{{ url_for('main.admin_users') }}">
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="q">Tìm kiếm User</label>
+                    <input type="text" name="q" id="q" class="form-control" placeholder="Nhập tên, email..." value="{{ request.args.get('q', '') }}">
+                </div>
+                <div class="form-group">
+                    <label for="role">Quyền</label>
+                    <select name="role" id="role" class="form-control">
+                        <option value="">Tất cả</option>
+                        <option value="user" {% if request.args.get('role') == 'user' %}selected{% endif %}>User</option>
+                        <option value="support" {% if request.args.get('role') == 'support' %}selected{% endif %}>Support</option>
+                        <option value="admin" {% if request.args.get('role') == 'admin' %}selected{% endif %}>Admin</option>
+                    </select>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">Lọc</button>
+                    <a href="{{ url_for('main.admin_users') }}" class="btn btn-secondary">Xóa lọc</a>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <table class="ticket-table">
+        <thead>
+            <tr>
+                <th>STT</th>
+                <th>Username</th>
+                <th>Email</th>
+                <th>Họ và tên</th>
+                <th>Phòng ban</th>
+                <th>Quyền</th>
+                <th>Hành động</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in users_pagination.items %}
+            <tr>
+                <td>{{ (users_pagination.page - 1) * users_pagination.per_page + loop.index }}</td>
+                <td>{{ user.username }}</td>
+                <td>{{ user.email }}</td>
+                <td>{{ user.full_name or '' }}</td>
+                <td>{{ user.department or '' }}</td>
+                <td>{{ user.role|title }}</td>
+                <td>
+                    <a href="{{ url_for('main.edit_user', user_id=user.id) }}" class="btn btn-secondary btn-sm">Sửa</a>
+                    <form action="{{ url_for('main.delete_user', user_id=user.id) }}" method="POST" style="display:inline;" onsubmit="return confirm('Bạn có chắc chắn muốn xóa người dùng này không?');">
+                        <button type="submit" class="btn btn-danger btn-sm">Xóa</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="pagination-container">
+        {% for page_num in users_pagination.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
+            {% if page_num %}
+                {% if users_pagination.page == page_num %}
+                    <a href="{{ url_for('main.admin_users', page=page_num, q=request.args.get('q', ''), role=request.args.get('role', '')) }}" class="btn btn-primary">{{ page_num }}</a>
+                {% else %}
+                    <a href="{{ url_for('main.admin_users', page=page_num, q=request.args.get('q', ''), role=request.args.get('role', '')) }}" class="btn btn-secondary">{{ page_num }}</a>
+                {% endif %}
+            {% else %}
+                ...
+            {% endif %}
+        {% endfor %}
+    </div>
+
+{% endblock content %}

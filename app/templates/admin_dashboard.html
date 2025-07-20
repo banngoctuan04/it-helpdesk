@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+{% block content %}
+    <div class="content-header">
+        <h1>Admin Dashboard</h1>
+    </div>
+    <hr>
+
+    <div class="filter-form-container">
+        <form method="GET" action="{{ url_for('main.admin_dashboard') }}">
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="q">Tìm kiếm</label>
+                    <input type="text" name="q" id="q" class="form-control" placeholder="Nhập tiêu đề, mô tả..." value="{{ request.args.get('q', '') }}">
+                </div>
+                <div class="form-group">
+                    <label for="status">Trạng thái</label>
+                    <select name="status" id="status" class="form-control">
+                        <option value="">Tất cả</option>
+                        <option value="open" {% if request.args.get('status') == 'open' %}selected{% endif %}>Mới (Open)</option>
+                        <option value="in_progress" {% if request.args.get('status') == 'in_progress' %}selected{% endif %}>Đang xử lý</option>
+                        <option value="closed" {% if request.args.get('status') == 'closed' %}selected{% endif %}>Đã đóng</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="priority">Độ ưu tiên</label>
+                    <select name="priority" id="priority" class="form-control">
+                        <option value="">Tất cả</option>
+                        <option value="low" {% if request.args.get('priority') == 'low' %}selected{% endif %}>Thấp</option>
+                        <option value="medium" {% if request.args.get('priority') == 'medium' %}selected{% endif %}>Trung bình</option>
+                        <option value="high" {% if request.args.get('priority') == 'high' %}selected{% endif %}>Cao</option>
+                    </select>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">Lọc</button>
+                    <a href="{{ url_for('main.admin_dashboard') }}" class="btn btn-secondary">Xóa lọc</a>
+                </div>
+            </div>
+        </form>
+    </div>
+    
+    <div class="stats-container">
+        <div class="stat-card">
+            <h3>{{ stats.open }}</h3>
+            <p>Ticket Mới (Open)</p>
+        </div>
+        <div class="stat-card">
+            <h3>{{ stats.in_progress }}</h3>
+            <p>Đang xử lý (In Progress)</p>
+        </div>
+        <div class="stat-card">
+            <h3>{{ stats.closed }}</h3>
+            <p>Đã đóng (Closed)</p>
+        </div>
+    </div>
+
+    <table class="ticket-table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Tiêu đề</th>
+                <th>Người tạo</th>
+                <th>Ưu tiên</th>
+                <th>Trạng thái</th>
+                <th>Ngày tạo</th>
+                <th>Hành động</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for ticket in tickets_pagination.items %}
+            <tr>
+                <td>#{{ ticket.id }}</td>
+                <td><a href="{{ url_for('main.ticket', ticket_id=ticket.id) }}">{{ ticket.title }}</a></td>
+                <td>{{ ticket.author.username }}</td>
+                <td><span class="priority-{{ ticket.priority }}">{{ ticket.priority|title }}</span></td>
+                <td><span class="badge status-{{ ticket.status }}">{{ ticket.status.replace('_', ' ')|title }}</span></td>
+                <td>{{ ticket.created_at.strftime('%d-%m-%Y') }}</td>
+                <td>
+                    <a href="{{ url_for('main.ticket', ticket_id=ticket.id) }}" class="btn btn-secondary">Xem</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="pagination-container">
+        {% for page_num in tickets_pagination.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
+            {% if page_num %}
+                {% if tickets_pagination.page == page_num %}
+                    <a href="{{ url_for('main.admin_dashboard', page=page_num) }}" class="btn btn-primary">{{ page_num }}</a>
+                {% else %}
+                    <a href="{{ url_for('main.admin_dashboard', page=page_num) }}" class="btn btn-secondary">{{ page_num }}</a>
+                {% endif %}
+            {% else %}
+                ...
+            {% endif %}
+        {% endfor %}
+    </div>
+{% endblock content %}

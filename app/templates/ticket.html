@@ -1,0 +1,138 @@
+{% import '_macros.html' as macros %}
+{% extends "base.html" %}
+{% block content %}
+<div class="ticket-detail-container">
+    <div class="ticket-info">
+        <h2>{{ ticket.title }} <span class="ticket-id">(#{{ ticket.id }})</span></h2>
+        <p><strong>Người tạo:</strong> {{ ticket.author.username }}</p>
+        <p><strong>Ngày tạo:</strong> {{ ticket.created_at.strftime('%d-%m-%Y %H:%M') }}</p>
+        <p><strong>Trạng thái:</strong> <span class="badge status-{{ ticket.status }}">{{ ticket.status.replace('_', ' ')|title }}</span></p>
+        <p><strong>Độ ưu tiên:</strong> <span class="priority-{{ ticket.priority }}"><i class="fas fa-flag"></i> {{ ticket.priority|title }}</span></p>
+        <p><strong>Giao cho:</strong> {{ ticket.assignee.username if ticket.assignee else 'Chưa có' }}</p>
+        <hr>
+        <h4>Mô tả:</h4>
+        <p class="ticket-description">{{ ticket.description }}</p>
+
+        {% if ticket.rating %}
+        <hr>
+        <h4>Đánh giá của bạn:</h4>
+        <p class="display-rating">
+            {% for i in range(ticket.rating) %}<i class="fas fa-star"></i>{% endfor %}{% for i in range(5 - ticket.rating) %}<i class="far fa-star"></i>{% endfor %}
+        </p>
+        {% if ticket.feedback %}
+            <p><strong>Góp ý:</strong> {{ ticket.feedback }}</p>
+        {% endif %}
+        {% endif %}
+
+        {% if ticket.review %}
+        <hr>
+        <h4>Đánh giá của bạn:</h4>
+        <p class="display-rating">
+            {% for i in range(ticket.review.rating) %}<i class="fas fa-star"></i>{% endfor %}{% for i in range(5 - ticket.review.rating) %}<i class="far fa-star"></i>{% endfor %}
+        </p>
+        {% if ticket.review.feedback %}
+            <p><strong>Góp ý:</strong> {{ ticket.review.feedback }}</p>
+        {% endif %}
+        {% endif %}
+        {% if ticket.status == 'closed' and current_user == ticket.author and not ticket.review and ticket.assigned_to %}
+        {% endif %}
+        
+    </div>
+
+    {% if current_user.is_support() %}
+    <div class="ticket-update-form">
+        <h3>Cập nhật Ticket</h3>
+        <form method="POST" action="">
+            {{ form.hidden_tag() }}
+            <div class="form-group">
+                {{ form.status.label(class="form-label") }}
+                {{ form.status(class="form-control") }}
+            </div>
+            <div class="form-group">
+                {{ form.assigned_to.label(class="form-label") }}
+                {{ form.assigned_to(class="form-control") }}
+            </div>
+            <div class="form-group">
+                {{ form.submit(class="btn btn-primary", value="Cập nhật") }}
+            </div>
+        </form>
+    </div>
+    {% endif %}
+
+    {% if ticket.status == 'closed' and current_user == ticket.author and not ticket.rating %}
+    <div class="rating-form">
+        <hr>
+        <h3>Đánh giá chất lượng hỗ trợ</h3>
+        <p>Yêu cầu của bạn đã được xử lý. Vui lòng cho chúng tôi biết trải nghiệm của bạn.</p>
+        <form method="POST" action="{{ url_for('main.rate_ticket', ticket_id=ticket.id) }}">
+            {{ rating_form.hidden_tag() }}
+            <div class="form-group stars">
+                {% for subfield in rating_form.rating %}
+                    {{ subfield(id=subfield.id) }} <label for="{{ subfield.id }}" title="{{ subfield.label.text }}"><i class="fas fa-star"></i></label>
+                {% endfor %}
+            </div>
+            <div class="form-group">
+                {{ rating_form.feedback.label(class="form-label") }}
+                {{ rating_form.feedback(class="form-control", rows=3) }}
+            </div>
+            <div class="form-group">
+                {{ rating_form.submit(class="btn btn-primary") }}
+            </div>
+        </form>
+    </div>
+    {% endif %}
+
+    {% if attachments %}
+    <div class="attachments-section">
+        <hr>
+        <h4><i class="fas fa-paperclip"></i> File đính kèm</h4>
+        <ul>
+            {% for attachment in attachments %}
+            <li><a href="{{ url_for('main.download_attachment', filename=attachment.filepath) }}" target="_blank">{{ attachment.filename }}</a></li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+
+    <div class="activity-log-section">
+        <hr>
+        <h4><i class="fas fa-history"></i> Lịch sử Ticket</h4>
+        <ul class="activity-list">
+            {% for log in activity_logs %}
+            <li>
+                <span class="log-timestamp">{{ log.timestamp.strftime('%d-%m-%Y %H:%M') }}</span> - 
+                <strong>{{ log.author.username if log.author else 'Hệ thống' }}</strong>
+                {{ log.action }}
+                <em>{{ log.details if log.details }}</em>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <div class="comments-section">
+        <hr>
+        <h4><i class="fas fa-comments"></i> Lịch sử trao đổi</h4>
+        <div class="comment-list">
+            {% for comment in comments %}
+            <div class="comment {% if comment.author.is_support() %}support-comment{% else %}user-comment{% endif %}">
+                <div class="comment-author">{{ comment.author.username }}</div>
+                <div class="comment-content"><p>{{ comment.content }}</p></div>
+                <div class="comment-timestamp">{{ comment.created_at.strftime('%d-%m-%Y %H:%M') }}</div>
+            </div>
+            {% endfor %}
+        </div>
+        <div class="comment-form">
+            <form method="POST" action="">
+                {{ comment_form.hidden_tag() }}
+                <div class="form-group">
+                    {{ comment_form.content(class="form-control", rows=4, placeholder="Nhập nội dung trả lời...") }}
+                </div>
+                <div class="form-group">
+                    {{ comment_form.submit(class="btn btn-primary") }}
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<a href="{{ url_for('main.home') }}" class="back-link">&larr; Quay lại Dashboard</a>
+{% endblock content %}
